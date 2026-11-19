@@ -1,0 +1,318 @@
+<!-- Ruta: Views/MainWindow.axaml -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:GestorMantenimientoVehicular.Views"
+        xmlns:services="using:GestorMantenimientoVehicular.Services"
+        x:Class="GestorMantenimientoVehicular.Views.MainWindow"
+        Title="Gestor de Mantenimiento Predictivo y Bitácora Vehicular"
+        Width="1180"
+        Height="760"
+        MinWidth="960"
+        MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Background="#F1F5F9">
+
+    <Window.Resources>
+        <views:HexToBrushConverter x:Key="HexBrushConverter" />
+    </Window.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*" Margin="18" RowSpacing="12">
+
+        <!-- Encabezado y Odómetro Actual -->
+        <Border Grid.Row="0" Background="#0F172A" CornerRadius="10" Padding="16">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Gestor de Mantenimiento Predictivo y Bitácora Vehicular"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="White" />
+                    <TextBlock Text="Control de desgaste por componente (Motor, Frenos, GNV, Suspensión) y comparativa Gasolina vs. GNV"
+                               FontSize="12"
+                               Foreground="#94A3B8" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="Odómetro Actual (km)" FontSize="11" Foreground="#CBD5E1" />
+                        <TextBox Name="TxtOdometroActual"
+                                 Width="150"
+                                 Watermark="Ej: 42500"
+                                 Background="White" />
+                    </StackPanel>
+                    <Button Name="BtnActualizarOdometro"
+                            Content="Aplicar Odómetro"
+                            Click="BtnActualizarOdometro_Click"
+                            VerticalAlignment="Bottom"
+                            Background="#2563EB"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Padding="14,8"
+                            CornerRadius="6" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Banner de Notificaciones CRUD / Validaciones -->
+        <Border Grid.Row="1"
+                Name="BannerNotificacion"
+                Background="#E0F2FE"
+                BorderBrush="#0284C7"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12,8"
+                IsVisible="True">
+            <TextBlock Name="TxtNotificacion"
+                       Text="Sistema inicializado correctamente. Base de datos SQLite lista."
+                       Foreground="#0369A1"
+                       FontWeight="Medium"
+                       TextWrapping="Wrap" />
+        </Border>
+
+        <!-- Cuerpo Principal: Formulario Izquierdo + Listado y Comparativa Derecho -->
+        <Grid Grid.Row="2" ColumnDefinitions="360,*" ColumnSpacing="16">
+
+            <!-- Panel Izquierdo: Formulario CRUD -->
+            <Border Grid.Column="0"
+                    Background="White"
+                    CornerRadius="10"
+                    Padding="16"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1">
+                <ScrollViewer>
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Registro / Edición de Componente"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Foreground="#1E293B" />
+
+                        <TextBlock Name="TxtIdSeleccionado"
+                                   Text="Modo: Nuevo registro"
+                                   FontSize="12"
+                                   Foreground="#64748B" />
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Tipo de Componente *" FontWeight="SemiBold" FontSize="12" Foreground="#334155" />
+                            <ComboBox Name="CmbTipoComponente" HorizontalAlignment="Stretch" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Nombre / Referencia del Repuesto *" FontWeight="SemiBold" FontSize="12" Foreground="#334155" />
+                            <TextBox Name="TxtNombre" Watermark="Ej: Pastillas delanteras cerámicas" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Tipo de Combustible *" FontWeight="SemiBold" FontSize="12" Foreground="#334155" />
+                            <ComboBox Name="CmbTipoCombustible" HorizontalAlignment="Stretch" />
+                        </StackPanel>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Km Instalación *" FontWeight="SemiBold" FontSize="12" Foreground="#334155" />
+                                <TextBox Name="TxtKmInstalacion" Watermark="Ej: 30000" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="Vida Útil (km) *" FontWeight="SemiBold" FontSize="12" Foreground="#334155" />
+                                <TextBox Name="TxtVidaUtilKm" Watermark="Ej: 40000" />
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Costo del Repuesto (COP) *" FontWeight="SemiBold" FontSize="12" Foreground="#334155" />
+                            <TextBox Name="TxtCostoRepuesto" Watermark="Ej: 185000" />
+                        </StackPanel>
+
+                        <Separator Margin="0,4" Background="#E2E8F0" />
+
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+                            <Button Grid.Row="0" Grid.Column="0"
+                                    Name="BtnGuardar"
+                                    Content="Guardar Nuevo"
+                                    Click="BtnGuardar_Click"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Background="#16A34A"
+                                    Foreground="White"
+                                    FontWeight="SemiBold"
+                                    Padding="10,9"
+                                    CornerRadius="6" />
+
+                            <Button Grid.Row="0" Grid.Column="1"
+                                    Name="BtnActualizar"
+                                    Content="Actualizar"
+                                    Click="BtnActualizar_Click"
+                                    IsEnabled="False"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Background="#2563EB"
+                                    Foreground="White"
+                                    FontWeight="SemiBold"
+                                    Padding="10,9"
+                                    CornerRadius="6" />
+
+                            <Button Grid.Row="1" Grid.Column="0"
+                                    Name="BtnEliminar"
+                                    Content="Eliminar"
+                                    Click="BtnEliminar_Click"
+                                    IsEnabled="False"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Background="#DC2626"
+                                    Foreground="White"
+                                    FontWeight="SemiBold"
+                                    Padding="10,9"
+                                    CornerRadius="6" />
+
+                            <Button Grid.Row="1" Grid.Column="1"
+                                    Name="BtnLimpiar"
+                                    Content="Limpiar"
+                                    Click="BtnLimpiar_Click"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Background="#64748B"
+                                    Foreground="White"
+                                    FontWeight="SemiBold"
+                                    Padding="10,9"
+                                    CornerRadius="6" />
+                        </Grid>
+
+                        <!-- Regla informativa -->
+                        <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="10">
+                            <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#475569"
+                                       Text="Nota técnica: Motor GNV aplica factor térmico 0.90; Frenos aplica margen de seguridad 0.85; SistemaGas limita inspección a 20,000 km; Suspensión aplica factor 0.95." />
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Panel Derecho: Resumen + Comparativa + Listado con ProgressBar -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,*" RowSpacing="12">
+
+                <!-- Tarjetas de Resumen y Comparativa Gasolina vs GNV -->
+                <Grid Grid.Row="0" ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                    <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="12" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Estado de Componentes" FontSize="12" Foreground="#64748B" FontWeight="SemiBold" />
+                            <TextBlock Name="TxtResumenTotal" Text="0 registrados" FontSize="18" FontWeight="Bold" Foreground="#0F172A" />
+                            <TextBlock Name="TxtResumenAlertas" Text="0 en alerta | 0 vencidos" FontSize="12" Foreground="#D97706" FontWeight="Medium" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="12" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Inversión en Repuestos" FontSize="12" Foreground="#64748B" FontWeight="SemiBold" />
+                            <TextBlock Name="TxtResumenInversion" Text="$ 0" FontSize="18" FontWeight="Bold" Foreground="#0F172A" />
+                            <TextBlock Text="Suma histórica registrada" FontSize="12" Foreground="#64748B" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#ECFDF5" CornerRadius="10" Padding="12" BorderBrush="#A7F3D0" BorderThickness="1">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Comparativa Gasolina vs. GNV (1,000 km)" FontSize="12" Foreground="#065F46" FontWeight="SemiBold" />
+                            <TextBlock Name="TxtResumenAhorro" Text="Ahorro GNV: $ 0" FontSize="16" FontWeight="Bold" Foreground="#047857" />
+                            <TextBlock Name="TxtResumenCombustible" Text="Gasolina: $ 0 | GNV: $ 0" FontSize="11" Foreground="#065F46" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Listado de Componentes con ProgressBar de Salud -->
+                <Border Grid.Row="1" Background="White" CornerRadius="10" Padding="14" BorderBrush="#E2E8F0" BorderThickness="1">
+                    <Grid RowDefinitions="Auto,*" RowSpacing="10">
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Bitácora Predictiva de Componentes (clic para editar o eliminar)"
+                                       FontSize="15"
+                                       FontWeight="Bold"
+                                       Foreground="#1E293B" />
+                            <TextBlock Grid.Column="1"
+                                       Text="Salud 100% = Nuevo | 0% = Reemplazo"
+                                       FontSize="11"
+                                       Foreground="#64748B"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+
+                        <ListBox Grid.Row="1"
+                                 Name="LstComponentes"
+                                 SelectionChanged="LstComponentes_SelectionChanged"
+                                 Background="Transparent"
+                                 BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="services:ComponenteEstadoItem">
+                                    <Border Background="#F8FAFC"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="12"
+                                            Margin="0,0,0,8">
+                                        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="6">
+                                            <!-- Fila 1: Nombre, Tipo, Combustible y Badge Estado -->
+                                            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                    <Border Background="#E2E8F0" CornerRadius="4" Padding="6,2">
+                                                        <TextBlock Text="{Binding TipoComponente}" FontSize="11" FontWeight="Bold" Foreground="#1E293B" />
+                                                    </Border>
+                                                    <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="Bold" Foreground="#0F172A" />
+                                                    <Border Background="#DBEAFE" CornerRadius="4" Padding="6,2">
+                                                        <TextBlock Text="{Binding TipoCombustible}" FontSize="11" FontWeight="SemiBold" Foreground="#1D4ED8" />
+                                                    </Border>
+                                                </StackPanel>
+
+                                                <Border Grid.Column="1"
+                                                        Background="{Binding ColorEstadoHex, Converter={StaticResource HexBrushConverter}}"
+                                                        CornerRadius="4"
+                                                        Padding="8,3">
+                                                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" FontWeight="Bold" Foreground="White" />
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- Fila 2: Datos numéricos -->
+                                            <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*">
+                                                <TextBlock Grid.Column="0" FontSize="12" Foreground="#475569">
+                                                    <Run Text="Instalado: " />
+                                                    <Run Text="{Binding KilometrajeInstalacion}" FontWeight="SemiBold" />
+                                                    <Run Text=" km" />
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="1" FontSize="12" Foreground="#475569">
+                                                    <Run Text="Vida efectiva: " />
+                                                    <Run Text="{Binding VidaUtilEfectivaKm}" FontWeight="SemiBold" />
+                                                    <Run Text=" km" />
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="2" FontSize="12" Foreground="#475569">
+                                                    <Run Text="Costo: " />
+                                                    <Run Text="{Binding CostoRepuestoTexto}" FontWeight="SemiBold" />
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="{Binding DetalleProximoMantenimiento}"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#1E293B"
+                                                           HorizontalAlignment="Right" />
+                                            </Grid>
+
+                                            <!-- Fila 3: ProgressBar de Salud -->
+                                            <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                                <ProgressBar Grid.Column="0"
+                                                             Minimum="0"
+                                                             Maximum="100"
+                                                             Value="{Binding PorcentajeSalud}"
+                                                             Foreground="{Binding ColorEstadoHex, Converter={StaticResource HexBrushConverter}}"
+                                                             Background="#E2E8F0"
+                                                             Height="12"
+                                                             CornerRadius="6"
+                                                             VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding PorcentajeSaludTexto}"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#334155"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
