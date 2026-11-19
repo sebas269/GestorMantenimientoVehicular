@@ -136,7 +136,7 @@ El acceso se implementa exclusivamente con `Microsoft.Data.Sqlite` (`SqliteConne
 ## 6.7. Instalación y ejecución
 
 ```bash
-git clone https://github.com/sebax667/GestorMantenimientoVehicular.git
+git clone https://github.com/sebas269/GestorMantenimientoVehicular
 cd GestorMantenimientoVehicular
 dotnet restore
 dotnet build
@@ -182,9 +182,7 @@ Esta captura muestra un estado vencido en rojo y componentes óptimos; no muestr
 
 ![Validaciones](evidencias/04_validaciones_banner.png)
 
-> **Pendiente:** aún no se ha recibido el archivo `evidencias/05_persistencia_reinicio.png`; la referencia solicitada se conserva para añadir la captura cuando esté disponible.
 
-![Persistencia SQLite](evidencias/05_persistencia_reinicio.png)
 
 #### Evidencia adicional de eliminación
 
